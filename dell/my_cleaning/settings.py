@@ -226,15 +226,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tashkent'
 
-import os
-from celery import Celery
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_cleaning.settings')
-
-app = Celery('my_cleaning')
-app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks()
-
 
 ESKIZ_API_KEY = "твoй_API_ключ_из_eskiz"
 SMS_SENDER = "MyCompany"
