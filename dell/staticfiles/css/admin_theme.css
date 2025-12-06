@@ -1,0 +1,5 @@
+/* static/css/admin_theme.css */
+body.dark-theme {
+    background-color: #1e1e1e;
+    color: white;
+}

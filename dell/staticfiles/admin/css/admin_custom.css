@@ -1,0 +1,38 @@
+/* Анимированный фон */
+body.login {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #0f2027);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: white;
+}
+
+/* Анимация градиента */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Кастом логотип */
+.custom-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.animated-logo {
+    width: 80px;
+    height: 80px;
+    animation: spin 6s linear infinite;
+    transition: transform 0.3s ease;
+}
+
+.animated-logo:hover {
+    transform: scale(1.1);
+}
+
+/* Убрать стандартное название */
+.login h1 {
+    display: none;
+}

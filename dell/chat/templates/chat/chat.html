@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mini Telegram</title>
+<style>
+    body { font-family: sans-serif; }
+    #chat-box { width: 500px; height: 400px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; }
+    #message-input { width: 400px; }
+    .message { margin: 5px 0; }
+    .message.self { text-align: right; color: blue; }
+    .message.admin { font-weight: bold; color: green; }
+    #typing { font-style: italic; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<h2>Mini Telegram Chat</h2>
+
+{% if user.is_staff %}
+<label>Выберите пользователя:
+<select id="user-select">
+    <option value="">-- выберите --</option>
+    {% for u in users %}
+    <option value="{{ u.id }}">{{ u.username }}</option>
+    {% endfor %}
+</select>
+</label>
+{% endif %}
+
+<div id="chat-box"></div>
+<div id="typing"></div>
+
+<input type="text" id="message-input" placeholder="Введите сообщение...">
+<button id="send-btn">Отправить</button>
+
+<script>
+let chatSocket;
+let selectedUserId = null;
+
+{% if user.is_staff %}
+const userSelect = document.getElementById("user-select");
+userSelect.addEventListener("change", function() {
+    selectedUserId = this.value;
+    if(chatSocket) chatSocket.close();
+    connectWebSocket();
+});
+{% else %}
+selectedUserId = {{ user.id }};
+connectWebSocket();
+{% endif %}
+
+function connectWebSocket() {
+    if(!selectedUserId) return;
+    chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + selectedUserId + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if(data.type === 'chat.message'){
+            addMessage(data.sender, data.message, data.is_admin);
+        } else if(data.type === 'chat.typing'){
+            document.getElementById('typing').innerText = data.is_typing ? data.user + " печатает..." : '';
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('WebSocket closed unexpectedly');
+    };
+}
+
+function addMessage(sender, message, isAdmin){
+    const chatBox = document.getElementById("chat-box");
+    const div = document.createElement("div");
+    div.classList.add("message");
+    if(sender === "{{ user.username }}") div.classList.add("self");
+    if(isAdmin) div.classList.add("admin");
+    div.innerText = sender + ": " + message;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+document.getElementById("send-btn").onclick = function() {
+    sendMessage();
+};
+
+document.getElementById("message-input").onkeyup = function(e){
+    if(e.key === "Enter") sendMessage();
+    if(chatSocket) chatSocket.send(JSON.stringify({"action": "typing", "recipient_id": selectedUserId, "is_typing": this.value.length>0}));
+};
+
+function sendMessage(){
+    const input = document.getElementById("message-input");
+    if(input.value && chatSocket){
+        chatSocket.send(JSON.stringify({"action": "message", "recipient_id": selectedUserId, "message": input.value}));
+        input.value = '';
+        chatSocket.send(JSON.stringify({"action": "typing", "recipient_id": selectedUserId, "is_typing": false}));
+    }
+}
+</script>
+</body>
+</html>
