@@ -1,0 +1,11 @@
+POST /register|login
+        |
+        v
+generate_code()
+        |
+        v
+Celery task
+        |
+        +--> Telegram (если упал ❌)
+        |
+        +--> Email (fallback ✅)

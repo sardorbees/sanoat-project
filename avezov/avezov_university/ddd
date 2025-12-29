@@ -1,0 +1,145 @@
+2️⃣ Endpoints и примеры запросов
+1. Register
+
+URL: /api/register/
+
+Body (JSON):
+
+{
+  "telegram_id": 123456789,
+  "name": "Ivan",
+  "surname": "Petrov",
+  "phone": "+998901234567"
+}
+
+
+Действие: создаёт пользователя и отправляет код на email.
+
+Response:
+
+{"status": "code_sent"}
+
+2. Login
+
+URL: /api/login/
+
+Body:
+
+{
+  "telegram_id": 123456789
+}
+
+
+Действие: генерирует код для входа и отправляет на email.
+
+Response:
+
+{"status": "code_sent"}
+
+3. Verify Code
+
+URL: /api/verify_code/
+
+Body:
+
+{
+  "telegram_id": 123456789,
+  "code": "1234"
+}
+
+
+Действие: проверяет код регистрации или входа.
+
+Response успешный:
+
+{"status": "verified", "redirect_url": "https://example.com"}
+
+
+Response ошибочный:
+
+{"status": "invalid_code"}
+
+4. Reset Password
+
+URL: /api/reset-password/
+
+Body:
+
+{
+  "phone": "+998901234567"
+}
+
+
+Действие: отправляет код для сброса пароля на email и Telegram.
+
+Response:
+
+{"success": "Код отправлен в Telegram"}
+
+5. Verify Reset Code
+
+URL: /api/verify-reset-code/
+
+Body:
+
+{
+  "phone": "+998901234567",
+  "code": "5678"
+}
+
+
+Response успешный:
+
+{"success": "Код подтверждён"}
+
+
+Response ошибочный:
+
+{"error": "Неверный код"}
+
+6. New Password
+
+URL: /api/new-password/
+
+Body:
+
+{
+  "phone": "+998901234567",
+  "code": "5678",
+  "new_password": "NewStrongPass123"
+}
+
+
+Действие: устанавливает новый пароль.
+
+Response успешный:
+
+{"success": "Пароль успешно изменён"}
+
+
+Response ошибочный:
+
+{"error": "Неверный или истёкший код"}
+
+7. Profile
+
+URL: /api/profile/<email>/
+
+Method: GET
+
+Headers:
+
+Authorization: Token <user_token>
+
+
+Response:
+
+{
+  "name": "Ivan",
+  "surname": "Petrov",
+  "phone": "+998901234567",
+  "passport_id": "AB123456",
+  "attestation_doc": "attestation.pdf",
+  "photo": "profile.jpg",
+  "is_verified": true
+}
